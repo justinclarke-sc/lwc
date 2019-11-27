@@ -3,7 +3,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 /* eslint-disable no-console */
 
 // getRecord wire service
-import { getRecord } from 'lightning/uiRecordApi';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 
 // fields to query via the getRecord wire method
 import ACCOUNT_PERSONCONTACTID_FIELD from '@salesforce/schema/Account.PersonContactId';
@@ -25,48 +25,48 @@ export default class getPersonAccountTokens extends LightningElement {
     @track personContactId;
     @track firstName;
     @track lastName;
-    
+
     @wire(getRecord, {
         recordId: '$recordId',
         fields: ACCOUNT_FIELDS
     }) wiregetRecordAccount({error, data}) {
-    
+
         console.log('getPersonAccountTokens.getRecordAccount wire method called');
-    
+
         if (error) {
-    
+
             console.log('getPersonAccountTokens.getRecordAccount: error: ', JSON.stringify(error));
-    
+
         } else if (data != undefined && data != null) {
-            
+
             console.log('getPersonAccountTokens.getRecordAccount: data: ', JSON.stringify(data));
 
-            this.personContactId = data.fields[ACCOUNT_PERSONCONTACTID_FIELD.fieldApiName].value;
-            this.firstName = data.fields[ACCOUNT_FIRSTNAME_FIELD.fieldApiName].value;
-            this.lastName = data.fields[ACCOUNT_LASTNAME_FIELD.fieldApiName].value;
+            this.personContactId = getFieldValue(data, ACCOUNT_PERSONCONTACTID_FIELD);
+            this.firstName = getFieldValue(data, ACCOUNT_FIRSTNAME_FIELD);
+            this.lastName = getFieldValue(data, ACCOUNT_LASTNAME_FIELD);
         }
     }
-        
+
     // person account custom fields on the contact object
     @track classification;
-    
+
     @wire(getRecord, {
         recordId: '$personContactId',
         fields: CONTACT_FIELDS
     }) wiregetRecordContact({error, data}) {
-    
+
         console.log('getPersonAccountTokens.getRecordContact wire method called');
-    
+
         if (error) {
-    
+
             console.log('getPersonAccountTokens.getRecordContact: error: ', JSON.stringify(error));
-    
+
         } else if (data != undefined && data != null) {
-    
+
             console.log('getPersonAccountTokens.getRecordContact: data: ', JSON.stringify(data));
-    
-            this.classification = data.fields[CONTACT_CLASSIFICATION_FIELD.fieldApiName].value;
-            
+
+            this.classification = getFieldValue(data, CONTACT_CLASSIFICATION_FIELD);
+
         }
     }
 
